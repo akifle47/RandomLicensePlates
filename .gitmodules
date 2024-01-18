@@ -1,0 +1,6 @@
+[submodule "deps/injector"]
+	path = deps/injector
+	url = https://github.com/thelink2012/injector
+[submodule "deps/dx9"]
+	path = deps/dx9
+	url = https://github.com/hrydgard/minidx9.git
