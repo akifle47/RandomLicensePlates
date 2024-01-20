@@ -47,7 +47,7 @@
     <TargetExt>.asi</TargetExt>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <OutDir>$(SolutionDir)build\$(Configuration)\bin\</OutDir>
-    <IncludePath>$(SolutionDir)deps\dx9;$(SolutionDir)deps\injector\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)deps\dx9\Include;$(SolutionDir)deps\injector\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)deps\dx9\Lib\x86;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -55,7 +55,7 @@
     <TargetExt>.asi</TargetExt>
     <CopyLocalDeploymentContent>true</CopyLocalDeploymentContent>
     <OutDir>$(SolutionDir)build\$(Configuration)\bin\</OutDir>
-    <IncludePath>$(SolutionDir)deps\dx9;$(SolutionDir)deps\injector\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)deps\dx9\Include;$(SolutionDir)deps\injector\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)deps\dx9\Lib\x86;$(LibraryPath)</LibraryPath>
     <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -93,6 +93,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\rage\Array.h" />
+    <ClInclude Include="src\rage\Base.h" />
+    <ClInclude Include="src\rage\Device.h" />
+    <ClInclude Include="src\rage\Dictionary.h" />
+    <ClInclude Include="src\rage\FunctorBase.h" />
+    <ClInclude Include="src\rage\Image.h" />
+    <ClInclude Include="src\rage\LightSource.h" />
+    <ClInclude Include="src\rage\RenderTarget.h" />
+    <ClInclude Include="src\rage\StringHash.h" />
+    <ClInclude Include="src\rage\Texture.h" />
+    <ClInclude Include="src\rage\TextureFactory.h" />
+    <ClInclude Include="src\rage\TxdStore.h" />
+    <ClInclude Include="src\rage\T_CB_Generic.h" />
+    <ClInclude Include="src\rage\Vector.h" />
+    <ClInclude Include="src\rage\Viewport.h" />
+    <ClInclude Include="src\rage\Weather.h" />
+    <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -61,7 +61,7 @@ namespace rage
 			return func(image, arg2);
 		}
 
-		grcRenderTargetPC *__stdcall CreateRenderTarget(const char *name, int32_t a2, uint32_t width, uint32_t height, uint32_t bitsPerPixel, grcRenderTargetDesc *desc)
+		grcRenderTargetPC *__stdcall CreateRenderTarget(const char *name, int32_t a2 /*always 3?*/, uint32_t width, uint32_t height, uint32_t bitsPerPixel, grcRenderTargetDesc *desc)
 		{
 			auto func = (grcRenderTargetPC *(__stdcall *)(const char *, int32_t, uint32_t, uint32_t, uint32_t, grcRenderTargetDesc*))(_vft[14]);
 			return func(name, a2, width, height, bitsPerPixel, desc);

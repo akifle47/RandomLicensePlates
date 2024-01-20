@@ -10,10 +10,10 @@ namespace rage
 	struct grcRenderTargetDesc
 	{
 		grcRenderTargetDesc()
-			: field_0(0)
-			, mMultisampleCount(0)
-			, field_8(1)
-			, mLevels(1)
+			: UseFloat(0)
+			, Multisample(0)
+			, MultisampleQuality(1)
+			, MipLevels(1)
 			, field_10(1)
 			, field_11(1)
 			, field_1C(1)
@@ -22,33 +22,33 @@ namespace rage
 			, field_28(1)
 			, field_12(0)
 			, mDepthRT(0)
-			, field_18(0)
+			, SliceCount(0)
 			, field_20(0)
-			, field_25(0)
+			, CreateAABuffer(0)
 			, field_27(0)
 			, field_29(0)
 			, field_2A(0)
 			, mFormat(grctfUNKNOWN)
 		{}
 
-		char field_0;
-		int mMultisampleCount;
-		char field_8;
-		int mLevels;
-		char field_10;
-		char field_11;
-		char field_12;
+		bool UseFloat;
+		int32_t Multisample;
+		uint8_t MultisampleQuality;
+		uint32_t MipLevels;
+		int8_t field_10;
+		int8_t field_11;
+		int8_t field_12;
 		grcRenderTargetPC *mDepthRT;
-		char field_18;
+		uint8_t SliceCount;
 		int field_1C;
 		int field_20;
 		bool field_24;
-		char field_25;
-		char field_26;
-		char field_27;
-		char field_28;
-		char field_29;
-		char field_2A;
+		bool CreateAABuffer;
+		int8_t field_26;
+		int8_t field_27;
+		int8_t field_28;
+		int8_t field_29;
+		int8_t field_2A;
 		alignas(4) grcTextureFormat mFormat;
 	};
 
@@ -78,8 +78,8 @@ namespace rage
 	class grcRenderTargetPC : public  grcRenderTarget
 	{
 	public:
-		char *mName;
-		IDirect3DTexture9 *mD3DTexture;
+		int8_t *mName;
+		IDirect3DTexture9 *mTextureD3D;
 		IDirect3DSurface9 *mD3DSurface;
 		uint16_t mWidth;
 		uint16_t mHeight;
