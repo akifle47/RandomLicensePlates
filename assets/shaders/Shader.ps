@@ -1,0 +1,14 @@
+uniform float4 Color : register(c0);
+uniform sampler2D TextureSampler : register(s0);
+
+struct PSIn
+{
+	float2 TexCoord : TEXCOORD0;
+};
+
+float4 main(PSIn psIn) : COLOR
+{
+	float4 outColor = tex2D(TextureSampler, psIn.TexCoord);
+	
+	return Color;
+}
