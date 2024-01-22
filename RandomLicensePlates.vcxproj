@@ -99,6 +99,7 @@
     <ClInclude Include="src\rage\Base.h" />
     <ClInclude Include="src\rage\Device.h" />
     <ClInclude Include="src\rage\Dictionary.h" />
+    <ClInclude Include="src\rage\Entity.h" />
     <ClInclude Include="src\rage\FunctorBase.h" />
     <ClInclude Include="src\rage\Image.h" />
     <ClInclude Include="src\rage\LightSource.h" />

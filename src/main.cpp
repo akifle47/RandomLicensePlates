@@ -6,12 +6,13 @@
 #include "rage/Device.h"
 #include "rage/T_CB_Generic.h"
 #include "rage/Vector.h"
+#include "rage/Entity.h"
 
 void Init();
 void LoadShaders();
-void Run();
+void Run(CEntity *entity);
 
-void RenderCallback();
+void RenderCallback(CEntity *entity);
 
 void __fastcall OnDeviceLost();
 void __fastcall OnDeviceReset();
@@ -47,9 +48,6 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID)
 	{
 		CVehicle__SubmitDrawCommandsO = (void(__cdecl *)())Utils::ReadMemory(0x4F2630);
 		Utils::WriteMemory(0x9915B0, CVehicle__SubmitDrawCommandsH);
-		Utils::WriteMemory(0x99D4E0, CVehicle__SubmitDrawCommandsH);
-		Utils::WriteMemory(0x99FCF8, CVehicle__SubmitDrawCommandsH);
-		Utils::WriteMemory(0x9AFB38, CVehicle__SubmitDrawCommandsH);
 		Utils::WriteMemory(0x9B0738, CVehicle__SubmitDrawCommandsH);
 		Utils::WriteMemory(0x9CDA80, CVehicle__SubmitDrawCommandsH);
 		Utils::WriteMemory(0x9CF070, CVehicle__SubmitDrawCommandsH);
@@ -67,11 +65,11 @@ IDirect3DTexture9 *gVehicleDetailRT = nullptr;
 IDirect3DVertexShader9 *gBlitVS = nullptr;
 IDirect3DPixelShader9 *gBlitPS = nullptr;
 
-void Run()
+void Run(CEntity *entity)
 {
 	Init();
 
-	auto cb = new rage::T_CB_Generic_NoArgs<void (__cdecl*)()>(RenderCallback);
+	auto cb = new rage::T_CB_Generic_1Arg<void (__cdecl*)(CEntity *), CEntity *>(RenderCallback, (CEntity*)&entity);
 	cb->Init();
 }
 
@@ -247,7 +245,7 @@ void __fastcall OnDeviceReset()
 	}
 }
 
-void RenderCallback()
+void RenderCallback(CEntity *entity)
 {
 	IDirect3DDevice9 *device = rage::grcDevice::GetDeviceD3D();
 
@@ -255,9 +253,16 @@ void RenderCallback()
 	if(slot > 0)
 	{
 		rage::grcTexturePC *texture = rage::CTxdStore::GetSlot(slot)->Lookup(rage::atStringHash("vehicle_generic_detail2", 0));
-		if(!texture->mTextureD3D)
+
+		if(texture->mTextureD3D != gVehicleDetailRT)
 		{
-			return;
+			if(texture->mTextureD3D)
+			{
+				texture->mTextureD3D->Release();
+			}
+
+			texture->mTextureD3D = gVehicleDetailRT;
+			texture->mFormat = rage::grctfA8R8G8B8;
 		}
 
 		IDirect3DSurface9 *vehicleDetailSurf = nullptr;
@@ -274,44 +279,10 @@ void RenderCallback()
 		device->GetPixelShader(&prevPS);
 		device->GetVertexDeclaration(&prevDecl);
 		device->GetViewport(&prevVP);
-
-		//copy
-		if(texture->mTextureD3D != gVehicleDetailRT)
-		{
-			texture->mTextureD3D->Release();
-			texture->mTextureD3D = gVehicleDetailRT;
-
-			gVehicleDetailRT->GetSurfaceLevel(0, &vehicleDetailSurf);
-
-			device->SetRenderTarget(0, vehicleDetailSurf);
-
-			device->SetRenderState(D3DRS_ZENABLE, false);
-
-			device->SetVertexShader(gShaderVS);
-			device->SetPixelShader(gShaderPS);
-
-			device->SetVertexDeclaration(gQuadVertexDecl);
-			device->SetStreamSource(0, gQuadVertexBuffer, 0, 20);
-
-			rage::Vector4 pixelOffset;
-			pixelOffset.x = (-1.0f / texture->mWidth);
-			pixelOffset.y = (1.0f / texture->mHeight);
-
-			rage::Vector4 color = {1.0f, 1.0f, 1.0f, 1.0f};
-
-			device->SetVertexShaderConstantF(5, &pixelOffset.x, 1);
-			device->SetPixelShaderConstantF(0, &color.x, 1);
-
-			device->SetTexture(0, texture->mTextureD3D);
-
-			device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2);
-
-			device->SetRenderState(D3DRS_ZENABLE, true);
-		}
-
-		//test
+		
 		gVehicleDetailRT->GetSurfaceLevel(0, &vehicleDetailSurf);
 
+		//bg
 		device->SetRenderTarget(0, vehicleDetailSurf);
 
 		device->SetRenderState(D3DRS_ZENABLE, false);
@@ -326,38 +297,72 @@ void RenderCallback()
 		pixelOffset.x = (-1.0f / texture->mWidth);
 		pixelOffset.y = (1.0f / texture->mHeight);
 
-		rage::Vector4 color = {0.0f, 1.0f, 0.0f, 1.0f};
+		srand(entity->mRandomSeed);
+		rage::Vector4 color {0.0f, 0.0f, 0.0f, 1.0f};
+		color.x = (float)rand() / (float)RAND_MAX;
+		color.y = (float)rand() / (float)RAND_MAX;
+		color.z = (float)rand() / (float)RAND_MAX;
 
 		device->SetVertexShaderConstantF(5, &pixelOffset.x, 1);
 		device->SetPixelShaderConstantF(0, &color.x, 1);
-
-		device->SetTexture(0, texture->mTextureD3D);
-
-		D3DVIEWPORT9 viewport = {0, 468, 97, 44, 0, 1};
-		device->SetViewport(&viewport);
 
 		device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2);
 
 		device->SetRenderState(D3DRS_ZENABLE, true);
 
+		/*
+		//test
+		device->SetRenderTarget(0, vehicleDetailSurf);
+
+		device->SetRenderState(D3DRS_ZENABLE, false);
+
+		device->SetVertexShader(gShaderVS);
+		device->SetPixelShader(gShaderPS);
+
+		device->SetVertexDeclaration(gQuadVertexDecl);
+		device->SetStreamSource(0, gQuadVertexBuffer, 0, 20);
+
+		rage::Vector4 pixelOffset;
+		pixelOffset.x = (-1.0f / texture->mWidth);
+		pixelOffset.y = (1.0f / texture->mHeight);
+
+		srand(entity->mRandomSeed);
+		rage::Vector4 color = {0.0f, 0.0f, 0.0f, 1.0f};
+		color.x = (float)rand() / (float)RAND_MAX;
+		color.y = (float)rand() / (float)RAND_MAX;
+		color.z = (float)rand() / (float)RAND_MAX;
+
+		device->SetVertexShaderConstantF(5, &pixelOffset.x, 1);
+		device->SetPixelShaderConstantF(0, &color.x, 1);
+
+		D3DVIEWPORT9 viewport = {4, 482, 89, 19, 0, 1};
+		device->SetViewport(&viewport);
+
+		device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2);
+
+		device->SetRenderState(D3DRS_ZENABLE, true);
+		*/
+
 		//update mip maps
 		device->SetViewport(&prevVP);
-		for(uint32_t i = 0; i < texture->mMipCount; i++)
+		for(uint32_t i = 0; i < texture->mMipCount - 1; i++)
 		{
 			IDirect3DSurface9 *surf1, *surf2;
 			gVehicleDetailRT->GetSurfaceLevel(i, &surf1);
 			gVehicleDetailRT->GetSurfaceLevel(i + 1, &surf2);
 
 			device->StretchRect(surf1, nullptr, surf2, nullptr, D3DTEXF_LINEAR);
-		}
 
+			surf1->Release();
+			surf2->Release();
+		}
+		
 		//restore render states
 		device->SetVertexShader(prevVS);
 		device->SetPixelShader(prevPS);
 		device->SetRenderTarget(0, prevSurf);
 		device->SetVertexDeclaration(prevDecl);
-		device->SetViewport(&prevVP);
-
+		
 		vehicleDetailSurf->Release();
 		prevSurf->Release();
 		prevDecl->Release();

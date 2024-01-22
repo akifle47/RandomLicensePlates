@@ -38,16 +38,30 @@ namespace rage
 
 	static_assert(sizeof(CBaseDC) == 0x8);
 
-	template<typename T>
+	template<typename T_func>
 	class T_CB_Generic_NoArgs : public CBaseDC
 	{
 	public:
-		T_CB_Generic_NoArgs(T function)
+		T_CB_Generic_NoArgs(T_func function)
 		{
-			auto func = (T_CB_Generic_NoArgs *(__thiscall *)(T_CB_Generic_NoArgs *, T))Utils::ReadMemory(0xBDBE0);
+			auto func = (T_CB_Generic_NoArgs *(__thiscall *)(T_CB_Generic_NoArgs *, T_func))Utils::ReadMemory(0xBDBE0);
 			func(this, function);
 		}
 
-		T mFunction;
+		T_func mFunction;
+	};
+
+	template<typename T_func, typename T_arg>
+	class T_CB_Generic_1Arg : public CBaseDC
+	{
+	public:
+		T_CB_Generic_1Arg(T_func function, T_arg arg)
+		{
+			auto func = (T_CB_Generic_1Arg *(__thiscall *)(T_CB_Generic_1Arg *, T_func, T_arg))Utils::ReadMemory(0x46C4E0);
+			func(this, function, arg);
+		}
+
+		T_func mFunction;
+		T_arg mArg;
 	};
 }
